@@ -38,8 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Ejecutar la consulta
         $stmt->execute();
 
-        // Mensaje de éxito
-        $mensaje = "Registro agregado con éxito.";
+        // redirigir a la página de historial con un mensaje de éxito
+
+        header("Location: add_record.php?success=1");
+        exit();
     } catch (PDOException $e) {
         $mensaje = "Error: " . $e->getMessage();
     }
@@ -48,22 +50,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Registro</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
-<body>
-    <h1>Agregar Nuevo Registro</h1>
 
-    <?php if ($mensaje): ?>
-        <p class="success-message"><?php echo $mensaje; ?></p>
+<body>
+    <h1>Crear tarea</h1>
+
+    <?php if (isset($_GET['success'])): ?>
+        <p class="success-message" style="display: none;">Registro agregado con éxito!, si lo desea puede agregar más</p>
     <?php endif; ?>
+
 
     <form action="add_record.php" method="POST">
         <label for="fecha">Fecha:</label>
-        <input type="datetime-local" id="fecha" name="fecha" required><br><br>
+        <input type="date" id="fecha" name="fecha" required><br><br>
 
         <label for="actividad">Actividad:</label>
         <input type="text" id="actividad" name="actividad" required><br><br>
@@ -74,12 +79,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="observaciones">Observaciones:</label>
         <textarea id="observaciones" name="observaciones"></textarea><br><br>
 
-        <button type="submit" >Agregar Registro</button>
+        <button type="submit">Guardar tarea en el registro</button>
     </form>
 
     <br>
-    <button class="historial-btn" onclick="window.location.href='../historial.php'">Ver Historial</button>
-    <a href="logout.php" class="logout-btn">Cerrar Sesión</a>
+    <div class="button-container">
+        <button class="historial-btn" onclick="window.location.href='../historial.php'">Ver historial de las tareas guardadas</button>
+        <button class="logout-btn" onclick="window.location.href='logout.php'">Cerrar Sesión</button>
+    </div>
+    <script src="../js/success-message.js"></script>
 
 </body>
+
+
 </html>

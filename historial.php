@@ -1,10 +1,21 @@
 <?php
+// Iniciar sesión
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: php/login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id']; // Obtener el ID del usuario logueado
+
 // Conexión a la base de datos
 include('php/db.php');
 
-// Obtener todas las tareas
-$sql = "SELECT * FROM tasks";
-$stmt = $pdo->query($sql);
+// Obtener solo las tareas del usuario logueado
+$sql = "SELECT * FROM tasks WHERE user_id = :user_id";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -20,6 +31,11 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
     <h1>Historial de Tareas</h1>
+
+    <div class="button-container">
+        <button class="registro-btn" onclick="window.location.href='php/add_record.php'">Ir a crear tarea</button>
+    </div>
+
 
     <table>
         <thead>
@@ -40,21 +56,27 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo $task['tiempo']; ?></td>
                     <td><?php echo $task['observaciones']; ?></td>
                     <td>
-                        <a href="php/edit_record.php?id=<?php echo $task['id']; ?>" class="edit-btn">Editar</a>
-                        <a href="php/delete_record.php?id=<?php echo $task['id']; ?>" class="delete-btn" onclick="return confirmDelete()">Eliminar</a>
+                        <!-- Botón para editar -->
+                        <button onclick="window.location.href='php/edit_record.php?id=<?php echo htmlspecialchars($task['id']); ?>'" class="edit-btn">Editar</button>
+
+                        <!-- Botón para eliminar -->
+                        <button onclick="return confirmDelete('<?php echo htmlspecialchars($task['id']); ?>')" class="delete-btn">Eliminar</button>
                     </td>
 
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
-    <a href="php/add_record.php" class="registro-btn">Volver al Registro</a>
     <script>
-    function confirmDelete() {
-        // Mostrar el cuadro de confirmación
-        return confirm("¿Estás seguro de que deseas eliminar este registro?");
-    }
-</script>
+        function confirmDelete(id) {
+            const confirmation = confirm("¿Estás seguro de que deseas eliminar este registro?");
+            if (confirmation) {
+                // Si se confirma, redirige para eliminar el registro
+                window.location.href = 'php/delete_record.php?id=' + id;
+            }
+            return false; // Evitar que la página se recargue automáticamente
+        }
+    </script>
 
 
 </body>

@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db = 'registro_diario';
 $user = 'root';  // Cambia si tienes otro usuario
-$pass = '';      // Cambia si tienes contraseña
+$pass = '1985';      // Cambia si tienes contraseña
 
 // Conectar con la base de datos
 try {

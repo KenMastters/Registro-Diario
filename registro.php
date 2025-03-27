@@ -11,7 +11,7 @@ if (isset($_SESSION['user_id'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Conexión a la base de datos
     include('php/db.php');
-    
+
     // Obtener los datos del formulario
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Preparar la consulta SQL para insertar al usuario
             $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
             $stmt = $pdo->prepare($sql);
-            
+
             // Vincular los parámetros
             $stmt->bindParam(':username', $username);
             $stmt->bindParam(':password', $hashedPassword);
-            
+
             // Ejecutar la consulta
             $stmt->execute();
 
@@ -52,13 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Usuario</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
+
 <body>
+<h1 class="title">Aplicación para el registro de tareas</h1>
+
     <h1>Registrar Usuario</h1>
     <form action="registro.php" method="POST">
         <label for="username">Nombre de Usuario:</label>
@@ -70,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <button type="submit">Registrar</button>
     </form>
 
-    <p>¿Ya tienes una cuenta? <a href="php/login.php">Iniciar sesión</a></p>
+    <p class="centered-text">¿Ya tienes una cuenta? <a href="php/login.php">Iniciar sesión</a></p>
 </body>
+
 </html>

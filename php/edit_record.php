@@ -47,11 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Editar Registro</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
+
 <body>
     <h1>Editar Registro</h1>
     <form action="" method="POST">
@@ -69,7 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <button type="submit">Guardar Cambios</button>
     </form>
+    <div class="button-container">
+        <button class="historial-btn" onclick="window.location.href='../historial.php'">Volver al Historial</button>
+    </div>
 
-    <p><a href="../historial.php">Volver al historial</a></p>
 </body>
+
 </html>
