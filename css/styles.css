@@ -320,6 +320,21 @@ input[type="date"] {
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Añade una sombra sutil alrededor del título */
     border-radius: 8px; /* Bordes redondeados en el fondo */
 }
+.pdf-btn {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pdf-btn:hover {
+    background-color: #45a049;
+}
+
 
 
 

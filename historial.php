@@ -35,6 +35,10 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="button-container">
         <button class="registro-btn" onclick="window.location.href='php/add_record.php'">Ir a crear tarea</button>
     </div>
+    <div class="button-container">
+        <button class="pdf-btn" onclick="window.location.href='download_pdf.php'">Descargar PDF</button>
+    </div>
+
 
 
     <table>
