@@ -31,9 +31,6 @@ $pdf = new tFPDF();
 $pdf->AddFont('DejaVu','','DejaVuSans.ttf', true); // Fuente normal
 $pdf->AddFont('DejaVu','B','DejaVuSans-Bold.ttf', true); // Fuente en negrita
 
-// Usar AliasNbPages() para el total de páginas
-$pdf->AliasNbPages();
-
 // Establecer la fuente y generar el PDF
 $pdf->SetFont('DejaVu', '', 12); // Fuente normal
 $pdf->AddPage();
@@ -65,7 +62,7 @@ $pdf->Image('images/Union Europea.jpg', 175, 10, 30, 0);
 $pdf->Ln(10);
 
 // Información general
-$pdf->SetFont('DejaVu', '', 7);
+$pdf->SetFont('DejaVu', '', 8);
 $pdf->Cell(95, 10, 'Centro docente: IES FRANCISCO DE GOYA - 30008340', 1, 0, 'L');
 $pdf->Cell(95, 10, 'Centro de trabajo: COMENIUS IDI, S.L.', 1, 1, 'L');
 $pdf->Cell(95, 10, 'Tutor/a del Centro Docente: JOSE ANTONIO BRAVO LÓPEZ', 1, 0, 'L');
@@ -75,24 +72,24 @@ $pdf->Cell(95, 10, '', 1, 1, 'L');
 $pdf->Cell(95, 10, 'Familia profesional: INFORMÁTICA Y COMUNICACIONES', 1, 0, 'L');
 $pdf->Cell(95, 10, 'Periodo: 17/03/2025 - 16/06/2025', 1, 1, 'L');
 $pdf->Cell(95, 10, 'Ciclo Formativo: DESARROLLO DE APLICACIONES WEB', 1, 0, 'L');
-$pdf->Cell(95, 10, 'Horas : 400', 1, 1, 'L');
+$pdf->Cell(95, 10, 'Semana del 17 al 23 de MARZO de 2025', 1, 1, 'L');
 $pdf->Ln(10);
 
 // Tabla de actividades con celdas de tamaño ajustado
-$pdf->SetFont('DejaVu', 'B', 10);//Fuente en negrita
+$pdf->SetFont('DejaVu', 'B', 10);
 
 // Anchos para la tabla
-$width_fecha = 15; // Ancho de la columna "Fecha"
-$width_actividad = 70; // Ancho de la columna "Actividades realizadas"
-$width_tiempo = 16; // Ancho de la columna "Tiempo"
-$width_observaciones = 90; // Ancho de la columna "Observaciones"
+$width_fecha = 30; // Ancho de la columna "Fecha"
+$width_actividad = 80; // Ancho de la columna "Actividades realizadas"
+$width_tiempo = 30; // Ancho de la columna "Tiempo"
+$width_observaciones = 50; // Ancho de la columna "Observaciones"
 
 // Cabecera de la tabla
 $pdf->Cell($width_fecha, 10, 'Fecha', 1, 0, 'C'); // Columna Fecha
 $pdf->Cell($width_actividad, 10, 'Actividades realizadas', 1, 0, 'C'); // Columna Actividades
 $pdf->Cell($width_tiempo, 10, 'Tiempo', 1, 0, 'C'); // Columna Tiempo
 $pdf->Cell($width_observaciones, 10, 'Observaciones', 1, 1, 'C'); // Columna Observaciones
-$pdf->SetFont('DejaVu', '', 7);
+$pdf->SetFont('DejaVu', '', 10);
 
 // Mostrar los datos de la base de datos
 foreach ($tasks as $task) {
@@ -108,7 +105,7 @@ foreach ($tasks as $task) {
     $pdf->Ln(1);
 }
 
-// Firmas en tres columnas con el orden correcto
+/// Firmas en tres columnas con el orden correcto
 $pdf->Ln(10);
 
 // Cambiar el tamaño de la fuente para las firmas
@@ -126,10 +123,7 @@ $pdf->Cell($width_columna, 10, 'Fdo.: ' . $nombre_alumno, 0, 0, 'C'); // Columna
 $pdf->Cell($width_columna, 10, 'Fdo.: ANA FUENSANTA HERNÁNDEZ ORTIZ', 0, 0, 'C'); // Columna 2: Firma Tutor Centro de Trabajo
 $pdf->Cell($width_columna, 10, 'Fdo.: JOSE ANTONIO BRAVO LÓPEZ', 0, 1, 'C'); // Columna 3: Firma Tutor Centro Docente
 
-// Mostrar el número de página al final de cada página
-$pdf->SetY(-15); // Posicionar el pie de página
-$pdf->SetFont('DejaVu', '', 8);
-$pdf->Cell(0, 10, 'Página ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C'); // Mostrar el número de página
+
 
 // Descargar el archivo PDF
 header('Content-Type: application/pdf');
