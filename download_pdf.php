@@ -32,7 +32,7 @@ $semana = 'SEMANA DEL 17 AL 23 DE MARZO DE 2025';
 $horas = '400';
 
 // Incluir TCPDF
-require_once('vendor/autoload.php');
+require_once(__DIR__ . '/TCPDF/tcpdf.php');
 
 // Crear instancia de TCPDF
 $pdf = new TCPDF();
@@ -141,6 +141,10 @@ $html_firmas = "<style>
 // Escribir las firmas en el PDF
 $pdf->writeHTML($html_firmas, true, false, true, false, '');
 
-// Descargar el PDF firmado
-$pdf->Output('Hoja_Semanal_Firmada.pdf', 'D');
-exit();
+// Guardar el PDF sin firmar
+$pdf_path = __DIR__ . '/Hoja_Semanal_Sin_Firma.pdf';
+$pdf->Output($pdf_path, 'F'); // Guardar el PDF en el servidor
+
+// Mostrar un enlace para firmar el PDF
+echo "<h3>El PDF se ha generado correctamente.</h3>";
+echo "<a href='firmar_pdf.php?file=" . urlencode($pdf_path) . "'>Haga clic aquí para firmar el PDF</a>";
