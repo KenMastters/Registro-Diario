@@ -5,134 +5,142 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id']; // Obtener el ID del usuario logueado
+$user_id = $_SESSION['user_id'];
 
 // Conexión a la base de datos
 include('php/db.php');
 
-// Consultar las tareas del usuario, incluyendo el nombre del usuario
-$sql = "SELECT tasks.id, tasks.fecha, tasks.actividad, tasks.tiempo, tasks.observaciones, users.username 
+// Consultar las tareas del usuario
+$sql = "SELECT tasks.fecha, tasks.actividad, tasks.tiempo, tasks.observaciones 
         FROM tasks 
-        JOIN users ON tasks.user_id = users.id 
         WHERE tasks.user_id = :user_id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$nombre_alumno = !empty($tasks) ? $tasks[0]['username'] : 'No disponible';
+// Datos fijos
+$nombre_alumno = 'DAVID MUÑOZ MARÍN';
+$centro_docente = 'IES FRANCISCO DE GOYA - 30008340';
+$tutor_docente = 'JOSE ANTONIO BRAVO LÓPEZ';
+$centro_trabajo = 'COMENIUS IDI, S.L.';
+$tutor_trabajo = 'ANA FUENSANTA HERNÁNDEZ ORTIZ';
+$familia_profesional = 'INFORMÁTICA Y COMUNICACIONES';
+$ciclo_formativo = 'DESARROLLO DE APLICACIONES WEB';
+$periodo = '17/03/2025 - 16/06/2025';
+$semana = 'SEMANA DEL 17 AL 23 DE MARZO DE 2025';
+$horas = '400';
 
-// Incluir TFPDF
-require_once('tfpdf/tfpdf.php'); // Asegúrate de incluir el archivo correcto de tFPDF
+// Incluir TCPDF
+require_once('vendor/autoload.php');
 
-$pdf = new tFPDF();
-
-// Registrar las fuentes correctamente con la ruta de las fuentes
-$pdf->AddFont('DejaVu','','DejaVuSans.ttf', true); // Fuente normal
-$pdf->AddFont('DejaVu','B','DejaVuSans-Bold.ttf', true); // Fuente en negrita
-
-// Usar AliasNbPages() para el total de páginas
-$pdf->AliasNbPages();
-
-// Establecer la fuente y generar el PDF
-$pdf->SetFont('DejaVu', '', 12); // Fuente normal
+// Crear instancia de TCPDF
+$pdf = new TCPDF();
+$pdf->SetMargins(10, 10, 10);
+$pdf->SetAutoPageBreak(TRUE, 10);
 $pdf->AddPage();
+$pdf->SetFont('helvetica', '', 8); // Fuente Helvetica, tamaño 10
 
-// Establecer márgenes para que todo esté alineado correctamente
-$pdf->SetLeftMargin(10);
-$pdf->SetRightMargin(10);
 
-// Encabezado
-$pdf->Image('images/Region de Murcia.jpg', 5, 10, 60, 0);
+// Encabezado con imágenes y texto centrado
+$pdf->Image('images/Union Europea.jpg', 180, 13, 20); // Imagen derecha
+$pdf->SetY(10); // Ajustar la posición vertical del texto
+$pdf->SetFont('helvetica', 'B', 10); // Helvetica en negrita
+$pdf->Cell(0, 4, 'MÓDULO DE FORMACIÓN EN CENTROS DE TRABAJO', 0, 1, 'C');
+$pdf->Cell(0, 4, 'HOJA SEMANAL DEL ALUMNO', 0, 1, 'C');
+$pdf->Cell(0, 4, 'ANEXO IV', 0, 1, 'C');
+$pdf->Ln(4);
+$pdf->Image('images/Region de Murcia.jpg', 10, 14, 50); // Imagen izquierda
 
-// Mover las líneas solicitadas después de la primera imagen y antes de la segunda
-$pdf->SetFont('DejaVu', 'B', 11); // Fuente en negrita
+// Contenido en HTML
+$html = "<style>
+    table { width: 100%; border-collapse: collapse; font-size: 8px; }
+    th { border: 0.5px solid black; padding: 5px; text-align: center; background-color: #f2f2f2; font-weight: bold; }
+    td { border: 0.5px solid black; padding: 5px; text-align: left; font-weight: normal; } 
+</style>
+<table>
+    <tr>
+        <td>
+            Centro docente: $centro_docente<br>
+            Tutor/a del Centro Docente: $tutor_docente<br>
+            Alumno/a: $nombre_alumno
+        </td>
+        <td>
+            Centro de trabajo: $centro_trabajo<br>
+            Tutor/a del Centro de Trabajo: $tutor_trabajo
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Familia profesional: $familia_profesional<br>
+            Ciclo Formativo: $ciclo_formativo
+        </td>
+        <td>
+            Periodo: $periodo<br>
+            Semana: $semana<br>
+            Horas: $horas
+        </td>
+    </tr>
+</table>
+<br>";
 
-// Alineación para evitar que se sobreponga a la imagen
-$pdf->SetX(15); // Ajustamos el X para que el texto no se sobreponga a la imagen de la izquierda
+// Escribir la primera tabla
+$pdf->writeHTML($html, true, false, true, false, '');
 
-$pdf->Cell(0, 10, 'MÓDULO DE FORMACIÓN EN CENTROS DE TRABAJO', 0, 1, 'C');
-$pdf->SetFont('DejaVu', 'B', 11);
-$pdf->SetX(15); 
-$pdf->Cell(0, 10, 'HOJA SEMANAL DEL ALUMNO', 0, 1, 'C');
+// Crear la tabla de tareas separada
+$html_tareas = "<style>
+    table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    th { border: 0.5px solid black; padding: 5px; text-align: center; background-color: #f2f2f2; font-weight: bold; }
+    td { border: 0.5px solid black; padding: 5px; text-align: center; font-weight: normal; }
+</style>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <th>Actividades realizadas</th>
+        <th>Tiempo</th>
+        <th>Observaciones</th>
+    </tr>";
 
-$pdf->SetFont('DejaVu', 'B', 11);
-$pdf->SetX(15); 
-$pdf->Cell(0, 10, 'ANEXO IV', 0, 1, 'C');
-
-// Segunda imagen
-$pdf->Image('images/Union Europea.jpg', 175, 10, 30, 0);
-$pdf->Ln(10);
-
-// Información general
-$pdf->SetFont('DejaVu', '', 7);
-$pdf->Cell(95, 10, 'Centro docente: IES FRANCISCO DE GOYA - 30008340', 1, 0, 'L');
-$pdf->Cell(95, 10, 'Centro de trabajo: COMENIUS IDI, S.L.', 1, 1, 'L');
-$pdf->Cell(95, 10, 'Tutor/a del Centro Docente: JOSE ANTONIO BRAVO LÓPEZ', 1, 0, 'L');
-$pdf->Cell(95, 10, 'Tutor/a del Centro de Trabajo: ANA FUENSANTA HERNÁNDEZ ORTIZ', 1, 1, 'L');
-$pdf->Cell(95, 10, 'Alumno/a: ' . $nombre_alumno, 1, 0, 'L');
-$pdf->Cell(95, 10, '', 1, 1, 'L');
-$pdf->Cell(95, 10, 'Familia profesional: INFORMÁTICA Y COMUNICACIONES', 1, 0, 'L');
-$pdf->Cell(95, 10, 'Periodo: 17/03/2025 - 16/06/2025', 1, 1, 'L');
-$pdf->Cell(95, 10, 'Ciclo Formativo: DESARROLLO DE APLICACIONES WEB', 1, 0, 'L');
-$pdf->Cell(95, 10, 'Horas : 400', 1, 1, 'L');
-$pdf->Ln(10);
-
-// Tabla de actividades con celdas de tamaño ajustado
-$pdf->SetFont('DejaVu', 'B', 10);//Fuente en negrita
-
-// Anchos para la tabla
-$width_fecha = 15; // Ancho de la columna "Fecha"
-$width_actividad = 70; // Ancho de la columna "Actividades realizadas"
-$width_tiempo = 16; // Ancho de la columna "Tiempo"
-$width_observaciones = 90; // Ancho de la columna "Observaciones"
-
-// Cabecera de la tabla
-$pdf->Cell($width_fecha, 10, 'Fecha', 1, 0, 'C'); // Columna Fecha
-$pdf->Cell($width_actividad, 10, 'Actividades realizadas', 1, 0, 'C'); // Columna Actividades
-$pdf->Cell($width_tiempo, 10, 'Tiempo', 1, 0, 'C'); // Columna Tiempo
-$pdf->Cell($width_observaciones, 10, 'Observaciones', 1, 1, 'C'); // Columna Observaciones
-$pdf->SetFont('DejaVu', '', 7);
-
-// Mostrar los datos de la base de datos
+// Agregar datos de tareas en la tabla
 foreach ($tasks as $task) {
-    $fecha = date("d/m/Y", strtotime($task['fecha']));
-    
-    // Imprimir la fila de datos con celdas alineadas
-    $pdf->Cell($width_fecha, 10, $fecha, 1, 0, 'C'); // Fecha
-    $pdf->Cell($width_actividad, 10, $task['actividad'], 1, 0, 'C'); // Actividades realizadas
-    $pdf->Cell($width_tiempo, 10, $task['tiempo'], 1, 0, 'C'); // Tiempo
-    $pdf->Cell($width_observaciones, 10, $task['observaciones'], 1, 1, 'C'); // Observaciones
-
-    // Salto de línea después de cada fila
-    $pdf->Ln(1);
+    $html_tareas .= "<tr>
+                        <td>" . date("d/m/Y", strtotime($task['fecha'])) . "</td>
+                        <td>{$task['actividad']}</td>
+                        <td>{$task['tiempo']}</td>
+                        <td>{$task['observaciones']}</td>
+                     </tr>";
 }
+$html_tareas .= "</table>";
 
-// Firmas en tres columnas con el orden correcto
-$pdf->Ln(10);
+// Escribir la tabla de tareas
+$pdf->writeHTML($html_tareas, true, false, true, false, '');
 
-// Cambiar el tamaño de la fuente para las firmas
-$pdf->SetFont('DejaVu', '', 8); // Tamaño de fuente más pequeño para las firmas
+// Firmas en tres columnas
+$pdf->Ln(10); // Espacio antes de las firmas
+$html_firmas = "<style>
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    td { text-align: center; vertical-align: top; padding: 20px 5px; font-weight: normal; } /* Espacio para las firmas */
+</style>
+<table>
+    <tr>
+        <td>
+            Alumno/a:<br><br><br> <!-- Espacio para la firma -->
+            Fdo.: $nombre_alumno
+        </td>
+        <td>
+            Vº Bº El Tutor del Centro de Trabajo:<br><br><br> <!-- Espacio para la firma -->
+            Fdo.: $tutor_trabajo
+        </td>
+        <td>
+            Vº Bº El Tutor del Centro Docente:<br><br><br> <!-- Espacio para la firma -->
+            Fdo.: $tutor_docente
+        </td>
+    </tr>
+</table>";
 
-// Definir anchos para las columnas de firmas (ajustado para que quepan 3 columnas)
-$width_columna = 60; // Ancho de cada columna para las firmas
+// Escribir las firmas en el PDF
+$pdf->writeHTML($html_firmas, true, false, true, false, '');
 
-// Fila de firmas: 3 columnas
-$pdf->Cell($width_columna, 10, 'Alumno/a: ' . '', 0, 0, 'C'); // Columna 1: Alumno
-$pdf->Cell($width_columna, 10, 'Vº Bº El Tutor del Centro de Trabajo', 0, 0, 'C'); // Columna 2: Tutor del Centro de Trabajo
-$pdf->Cell($width_columna, 10, 'Vº Bº El Tutor del Centro Docente', 0, 1, 'C'); // Columna 3: Tutor del Centro Docente
-$pdf->Ln(10);
-$pdf->Cell($width_columna, 10, 'Fdo.: ' . $nombre_alumno, 0, 0, 'C'); // Columna 1: Firma Alumno
-$pdf->Cell($width_columna, 10, 'Fdo.: ANA FUENSANTA HERNÁNDEZ ORTIZ', 0, 0, 'C'); // Columna 2: Firma Tutor Centro de Trabajo
-$pdf->Cell($width_columna, 10, 'Fdo.: JOSE ANTONIO BRAVO LÓPEZ', 0, 1, 'C'); // Columna 3: Firma Tutor Centro Docente
-
-// Mostrar el número de página al final de cada página
-$pdf->SetY(-15); // Posicionar el pie de página
-$pdf->SetFont('DejaVu', '', 8);
-$pdf->Cell(0, 10, 'Página ' . $pdf->PageNo() . ' de {nb}', 0, 0, 'C'); // Mostrar el número de página
-
-// Descargar el archivo PDF
-header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="Hoja_Semanal.pdf"');
-$pdf->Output('D', 'Hoja_Semanal.pdf');
-?>
+// Descargar el PDF firmado
+$pdf->Output('Hoja_Semanal_Firmada.pdf', 'D');
+exit();
