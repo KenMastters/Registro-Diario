@@ -10,6 +10,16 @@ $user_id = $_SESSION['user_id'];
 // Conexión a la base de datos
 include('php/db.php');
 
+// Recuperar el nombre del usuario desde la base de datos
+$sql_usuario = "SELECT username AS nombre FROM users WHERE id = :user_id";
+$stmt_usuario = $pdo->prepare($sql_usuario);
+$stmt_usuario->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt_usuario->execute();
+$result_usuario = $stmt_usuario->fetch(PDO::FETCH_ASSOC);
+
+// Si se encuentra el usuario, usar su nombre; de lo contrario, usar un valor predeterminado
+$nombre_alumno = $result_usuario['nombre'] ?? 'Usuario Desconocido';
+
 // Consultar las tareas del usuario
 $sql = "SELECT tasks.fecha, tasks.actividad, tasks.tiempo, tasks.observaciones 
         FROM tasks 
@@ -30,7 +40,6 @@ $result_semana = $stmt_semana->fetch(PDO::FETCH_ASSOC);
 $semana = $result_semana['semana'] ?? 'SEMANA NO DEFINIDA';
 
 // Datos fijos
-$nombre_alumno = 'DAVID MUÑOZ MARÍN';
 $centro_docente = 'IES FRANCISCO DE GOYA - 30008340';
 $tutor_docente = 'JOSE ANTONIO BRAVO LÓPEZ';
 $centro_trabajo = 'COMENIUS IDI, S.L.';
