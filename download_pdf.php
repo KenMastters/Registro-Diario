@@ -19,6 +19,16 @@ $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtener la semana desde la base de datos
+$sql_semana = "SELECT DISTINCT semana FROM tasks WHERE user_id = :user_id LIMIT 1";
+$stmt_semana = $pdo->prepare($sql_semana);
+$stmt_semana->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt_semana->execute();
+$result_semana = $stmt_semana->fetch(PDO::FETCH_ASSOC);
+
+// Si se encuentra una semana, úsala; de lo contrario, usa un valor predeterminado
+$semana = $result_semana['semana'] ?? 'SEMANA NO DEFINIDA';
+
 // Datos fijos
 $nombre_alumno = 'DAVID MUÑOZ MARÍN';
 $centro_docente = 'IES FRANCISCO DE GOYA - 30008340';
@@ -28,7 +38,6 @@ $tutor_trabajo = 'ANA FUENSANTA HERNÁNDEZ ORTIZ';
 $familia_profesional = 'INFORMÁTICA Y COMUNICACIONES';
 $ciclo_formativo = 'DESARROLLO DE APLICACIONES WEB';
 $periodo = '17/03/2025 - 16/06/2025';
-$semana = 'SEMANA DEL 17 AL 23 DE MARZO DE 2025';
 $horas = '400';
 
 // Incluir TCPDF
@@ -40,7 +49,6 @@ $pdf->SetMargins(10, 10, 10);
 $pdf->SetAutoPageBreak(TRUE, 10);
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 8); // Fuente Helvetica, tamaño 10
-
 
 // Encabezado con imágenes y texto centrado
 $pdf->Image('images/Union Europea.jpg', 180, 13, 20); // Imagen derecha
@@ -141,10 +149,13 @@ $html_firmas = "<style>
 // Escribir las firmas en el PDF
 $pdf->writeHTML($html_firmas, true, false, true, false, '');
 
-// Guardar el PDF sin firmar
-$pdf_path = __DIR__ . '/Hoja_Semanal_Sin_Firma.pdf';
-$pdf->Output($pdf_path, 'F'); // Guardar el PDF en el servidor
+// Descargar el PDF directamente
+$pdf->Output('Hoja_Semanal.pdf', 'D'); // 'D' fuerza la descarga del archivo
 
-// Mostrar un enlace para firmar el PDF
-echo "<h3>El PDF se ha generado correctamente.</h3>";
-echo "<a href='firmar_pdf.php?file=" . urlencode($pdf_path) . "'>Haga clic aquí para firmar el PDF</a>";
+// // Guardar el PDF sin firmar
+// $pdf_path = __DIR__ . '/Hoja_Semanal_Sin_Firma.pdf';
+// $pdf->Output($pdf_path, 'F'); // Guardar el PDF en el servidor
+
+// // Mostrar un enlace para firmar el PDF
+// echo "<h3>El PDF se ha generado correctamente.</h3>";
+// echo "<a href='firmar_pdf.php?file=" . urlencode($pdf_path) . "'>Haga clic aquí para firmar el PDF</a>";

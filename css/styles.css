@@ -334,9 +334,32 @@ input[type="date"] {
 .pdf-btn:hover {
     background-color: #45a049;
 }
+/* Contenedor para los mensajes */
+.message-container {
+    margin: 20px auto;
+    text-align: center;
+    width: 80%;
+    transition: opacity 0.5s ease; /* Transición para el desvanecimiento */
+}
 
+/* Mensaje de éxito */
+.success-message {
+    color: #28a745; /* Verde */
+    background-color: #d4edda; /* Fondo verde claro */
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+}
 
-
-
-
-
+/* Mensaje de error */
+.error-message {
+    color: #dc3545; /* Rojo */
+    background-color: #f8d7da; /* Fondo rojo claro */
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+}

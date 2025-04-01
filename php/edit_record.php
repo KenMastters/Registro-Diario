@@ -28,12 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $actividad = $_POST['actividad'];
     $tiempo = $_POST['tiempo'];
     $observaciones = $_POST['observaciones'];
+    $semana = $_POST['semana']; // Capturar el valor de la semana
 
-    $updateStmt = $pdo->prepare("UPDATE tasks SET fecha = :fecha, actividad = :actividad, tiempo = :tiempo, observaciones = :observaciones WHERE id = :id");
+    $updateStmt = $pdo->prepare("UPDATE tasks SET fecha = :fecha, actividad = :actividad, tiempo = :tiempo, observaciones = :observaciones, semana = :semana WHERE id = :id");
     $updateStmt->bindParam(':fecha', $fecha);
     $updateStmt->bindParam(':actividad', $actividad);
     $updateStmt->bindParam(':tiempo', $tiempo);
     $updateStmt->bindParam(':observaciones', $observaciones);
+    $updateStmt->bindParam(':semana', $semana); // Vincular el valor de la semana
     $updateStmt->bindParam(':id', $id);
 
     if ($updateStmt->execute()) {
@@ -69,12 +71,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="observaciones">Observaciones:</label>
         <textarea id="observaciones" name="observaciones"><?= $task['observaciones'] ?></textarea><br><br>
 
+        <!-- Nuevo campo para la semana -->
+        <label for="semana">Semana:</label>
+        <input type="text" id="semana" name="semana" value="<?= $task['semana'] ?>" required><br><br>
+
         <button type="submit">Guardar Cambios</button>
     </form>
     <div class="button-container">
         <button class="historial-btn" onclick="window.location.href='../historial.php'">Volver al Historial</button>
     </div>
 
+    <!-- Script para calcular la semana automáticamente -->
+    <script>
+        document.getElementById('fecha').addEventListener('change', function () {
+            const fechaSeleccionada = new Date(this.value);
+            const lunes = new Date(fechaSeleccionada);
+            lunes.setDate(fechaSeleccionada.getDate() - fechaSeleccionada.getDay() + 1); // Lunes
+            const domingo = new Date(lunes);
+            domingo.setDate(lunes.getDate() + 6); // Domingo
+
+            const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
+            const semanaTexto = `SEMANA DEL ${lunes.toLocaleDateString('es-ES', opciones)} AL ${domingo.toLocaleDateString('es-ES', opciones)}`;
+            document.getElementById('semana').value = semanaTexto;
+        });
+    </script>
 </body>
 
 </html>

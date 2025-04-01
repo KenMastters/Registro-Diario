@@ -13,6 +13,13 @@ include('db.php');
 
 $mensaje = ""; // Variable para mostrar mensajes al usuario
 
+// Calcular la semana actual (de lunes a domingo)
+setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'Spanish_Spain', 'es'); // Configurar el idioma a español
+$inicio_semana = strtotime('last monday', strtotime('tomorrow')); // Lunes de esta semana
+$fin_semana = strtotime('next sunday', $inicio_semana); // Domingo de esta semana
+
+$semana_actual = "SEMANA DEL " . strftime('%d de %B', $inicio_semana) . " AL " . strftime('%d de %B de %Y', $fin_semana);
+
 // Verificar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Obtener los datos del formulario
@@ -20,30 +27,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $actividad = $_POST['actividad'];
     $tiempo = $_POST['tiempo'];
     $observaciones = $_POST['observaciones'];
+    $semana = $_POST['semana']; // Capturar el valor de la semana
     $user_id = $_SESSION['user_id']; // Obtener el ID del usuario logueado
 
-    try {
-        // Preparar la consulta SQL para insertar la tarea
-        $sql = "INSERT INTO tasks (fecha, actividad, tiempo, observaciones, user_id) 
-                VALUES (:fecha, :actividad, :tiempo, :observaciones, :user_id)";
-        $stmt = $pdo->prepare($sql);
+    // Validar el formato del campo "Semana"
+    if (!preg_match('/^SEMANA DEL/', $semana)) {
+        $mensaje = "El campo 'Semana' debe comenzar con 'SEMANA DEL'.";
+    } else {
+        try {
+            // Preparar la consulta SQL para insertar la tarea
+            $sql = "INSERT INTO tasks (fecha, actividad, tiempo, observaciones, semana, user_id) 
+                    VALUES (:fecha, :actividad, :tiempo, :observaciones, :semana, :user_id)";
+            $stmt = $pdo->prepare($sql);
 
-        // Vincular los parámetros
-        $stmt->bindParam(':fecha', $fecha);
-        $stmt->bindParam(':actividad', $actividad);
-        $stmt->bindParam(':tiempo', $tiempo);
-        $stmt->bindParam(':observaciones', $observaciones);
-        $stmt->bindParam(':user_id', $user_id);
+            // Vincular los parámetros
+            $stmt->bindParam(':fecha', $fecha);
+            $stmt->bindParam(':actividad', $actividad);
+            $stmt->bindParam(':tiempo', $tiempo);
+            $stmt->bindParam(':observaciones', $observaciones);
+            $stmt->bindParam(':semana', $semana); // Vincular el valor de la semana
+            $stmt->bindParam(':user_id', $user_id);
 
-        // Ejecutar la consulta
-        $stmt->execute();
+            // Ejecutar la consulta
+            $stmt->execute();
 
-        // redirigir a la página de historial con un mensaje de éxito
-
-        header("Location: add_record.php?success=1");
-        exit();
-    } catch (PDOException $e) {
-        $mensaje = "Error: " . $e->getMessage();
+            // Redirigir a la página con un mensaje de éxito
+            header("Location: add_record.php?success=1");
+            exit();
+        } catch (PDOException $e) {
+            $mensaje = "Error: " . $e->getMessage();
+        }
     }
 }
 ?>
@@ -61,10 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <h1>Crear tarea</h1>
 
-    <?php if (isset($_GET['success'])): ?>
-        <p class="success-message" style="display: none;">Registro agregado con éxito!, si lo desea puede agregar más</p>
+    <?php if (!empty($mensaje)): ?>
+        <p class="error-message"><?php echo $mensaje; ?></p>
     <?php endif; ?>
 
+    <?php if (isset($_GET['success'])): ?>
+        <p class="success-message">¡Registro agregado con éxito! Si lo desea, puede agregar más tareas.</p>
+    <?php endif; ?>
 
     <form action="add_record.php" method="POST">
         <label for="fecha">Fecha:</label>
@@ -79,6 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <label for="observaciones">Observaciones:</label>
         <textarea id="observaciones" name="observaciones"></textarea><br><br>
 
+        <!-- Nuevo campo para la semana -->
+        <label for="semana">Semana:</label>
+        <input type="text" id="semana" name="semana" value="<?php echo $semana_actual; ?>" required><br><br>
+
         <button type="submit">Guardar tarea en el registro</button>
     </form>
 
@@ -90,6 +110,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="../js/success-message.js"></script>
 
 </body>
-
 
 </html>

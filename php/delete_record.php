@@ -1,25 +1,35 @@
 <?php
-session_start();  // Mantener la sesión activa
-include('db.php');
-
-// Verificar que el ID esté presente en la URL
-if (!isset($_GET['id'])) {
-    header("Location: ../historial.php");  // Si no hay ID, redirigir al historial
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit();
 }
 
-$id = $_GET['id'];
+// Verificar si se recibió el parámetro 'id'
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']); // Asegurarse de que el ID sea un número entero
 
-// Eliminar el registro con el ID proporcionado
-$stmt = $pdo->prepare("DELETE FROM tasks WHERE id = :id");
-$stmt->bindParam(':id', $id);
+    // Conexión a la base de datos
+    include('db.php');
 
-if ($stmt->execute()) {
-    // Redirigir al formulario de agregar registro después de la eliminación
-    header("Location: ../historial.php");
-    exit();
+    // Preparar la consulta para eliminar el registro
+    $sql = "DELETE FROM tasks WHERE id = :id AND user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+
+    // Ejecutar la consulta
+    if ($stmt->execute()) {
+        // Redirigir al historial con un mensaje de éxito
+        header("Location: ../historial.php?message=deleted");
+        exit();
+    } else {
+        // Redirigir al historial con un mensaje de error
+        header("Location: ../historial.php?message=error");
+        exit();
+    }
 } else {
-    // Si hay un error en la eliminación, mostrar un mensaje
-    echo "Error al eliminar el registro.";
+    // Redirigir al historial si no se recibió un ID
+    header("Location: ../historial.php?message=invalid");
+    exit();
 }
-?>

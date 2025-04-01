@@ -1,5 +1,4 @@
 <?php
-// Iniciar sesión
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: php/login.php");
@@ -16,7 +15,7 @@ $sql = "SELECT * FROM tasks WHERE user_id = :user_id";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // Obtener todas las tareas como un array asociativo
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +29,18 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
+    <?php if (isset($_GET['message'])): ?>
+        <div class="message-container">
+            <?php if ($_GET['message'] == 'deleted'): ?>
+                <p class="success-message">El registro se eliminó correctamente.</p>
+            <?php elseif ($_GET['message'] == 'error'): ?>
+                <p class="error-message">Hubo un error al intentar eliminar el registro.</p>
+            <?php elseif ($_GET['message'] == 'invalid'): ?>
+                <p class="error-message">No se recibió un ID válido para eliminar.</p>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
     <h1>Historial de Tareas</h1>
 
     <div class="button-container">
@@ -39,50 +50,63 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <button class="pdf-btn" onclick="window.location.href='download_pdf.php'">Descargar PDF</button>
     </div>
 
-
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Fecha</th>
-                <th>Actividad</th>
-                <th>Tiempo</th>
-                <th>Observaciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($tasks as $task): ?>
+    <div class="table-container">
+        <table>
+            <thead>
                 <tr>
-                    <td><?php echo $task['id']; ?></td>
-                    <td><?php echo $task['fecha']; ?></td>
-                    <td><?php echo $task['actividad']; ?></td>
-                    <td><?php echo $task['tiempo']; ?></td>
-                    <td><?php echo $task['observaciones']; ?></td>
-                    <td>
-                        <!-- Botón para editar -->
-                        <button onclick="window.location.href='php/edit_record.php?id=<?php echo htmlspecialchars($task['id']); ?>'" class="edit-btn">Editar</button>
-
-                        <!-- Botón para eliminar -->
-                        <button onclick="return confirmDelete('<?php echo htmlspecialchars($task['id']); ?>')" class="delete-btn">Eliminar</button>
-                    </td>
-
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Actividad</th>
+                    <th>Tiempo</th>
+                    <th>Observaciones</th>
+                    <th>Semana</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    <script>
-        function confirmDelete(id) {
-            const confirmation = confirm("¿Estás seguro de que deseas eliminar este registro?");
-            if (confirmation) {
-                // Si se confirma, redirige para eliminar el registro
-                window.location.href = 'php/delete_record.php?id=' + id;
-            }
-            return false; // Evitar que la página se recargue automáticamente
-        }
-    </script>
+            </thead>
+            <tbody>
+                <?php if (!empty($tasks)): ?>
+                    <?php foreach ($tasks as $task): ?>
+                        <tr>
+                            <td><?php echo $task['id']; ?></td>
+                            <td><?php echo $task['fecha']; ?></td>
+                            <td><?php echo $task['actividad']; ?></td>
+                            <td><?php echo $task['tiempo']; ?></td>
+                            <td class="truncate" title="<?php echo $task['observaciones']; ?>">
+                                <?php echo $task['observaciones']; ?>
+                            </td>
+                            <td><?php echo $task['semana']; ?></td>
+                            <td>
+                                <!-- Botón para editar -->
+                                <button onclick="window.location.href='php/edit_record.php?id=<?php echo htmlspecialchars($task['id']); ?>'" class="edit-btn">Editar</button>
 
-
+                                <!-- Botón para eliminar -->
+                                <button
+                                    onclick="if(confirm('¿Estás seguro de que deseas eliminar este registro?')) { window.location.href='php/delete_record.php?id=<?php echo htmlspecialchars($task['id']); ?>'; }"
+                                    class="delete-btn">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="7">No hay tareas registradas.</td>
+                    </tr>
+                <?php endif; ?>
+                <script>
+                    // Esperar 1 segundo (1000 ms) y luego ocultar el mensaje
+                    setTimeout(() => {
+                        const messageContainer = document.querySelector('.message-container');
+                        if (messageContainer) {
+                            messageContainer.style.transition = 'opacity 0.5s ease';
+                            messageContainer.style.opacity = '0'; // Desvanecer el mensaje
+                            setTimeout(() => messageContainer.remove(), 500); // Eliminar del DOM después de desvanecer
+                        }
+                    }, 2000); // 2000 ms = 2 segundos
+                </script>
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>
