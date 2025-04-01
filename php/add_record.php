@@ -18,7 +18,14 @@ setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'Spanish_Spain', 'es'); // Configurar
 $inicio_semana = strtotime('last monday', strtotime('tomorrow')); // Lunes de esta semana
 $fin_semana = strtotime('next sunday', $inicio_semana); // Domingo de esta semana
 
-$semana_actual = "SEMANA DEL " . strftime('%d de %B', $inicio_semana) . " AL " . strftime('%d de %B de %Y', $fin_semana);
+// Calcular el número de la semana del año
+$numero_semana = date('W', $inicio_semana); // Número de la semana basado en el lunes
+
+// Formatear el rango de fechas
+$rango_fechas = "periodo del " . strftime('%d de %B', $inicio_semana) . " al " . strftime('%d de %B', $fin_semana);
+
+// Combinar el número de la semana con el rango de fechas
+$semana_actual = "Semana $numero_semana, $rango_fechas";
 
 // Verificar si el formulario fue enviado
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -31,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_SESSION['user_id']; // Obtener el ID del usuario logueado
 
     // Validar el formato del campo "Semana"
-    if (!preg_match('/^SEMANA DEL/', $semana)) {
-        $mensaje = "El campo 'Semana' debe comenzar con 'SEMANA DEL'.";
+    if (!preg_match('/^Semana \d+, periodo del/', $semana)) {
+        $mensaje = "El campo 'Semana' debe comenzar con 'Semana X, periodo del'.";
     } else {
         try {
             // Preparar la consulta SQL para insertar la tarea

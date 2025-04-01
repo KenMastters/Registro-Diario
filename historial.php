@@ -45,6 +45,7 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // Obtener todas las tareas como un 
 
     <div class="button-container">
         <button class="registro-btn" onclick="window.location.href='php/add_record.php'">Ir a crear tarea</button>
+        <button class="logout-btn" onclick="window.location.href='php/logout.php'">Cerrar Sesión</button>
     </div>
     <div class="button-container">
         <button class="pdf-btn" onclick="window.location.href='download_pdf.php'">Descargar PDF</button>
@@ -54,28 +55,28 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // Obtener todas las tareas como un 
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Fecha</th>
-                    <th>Actividad</th>
-                    <th>Tiempo</th>
-                    <th>Observaciones</th>
-                    <th>Semana</th>
-                    <th>Acciones</th>
+                    <th class="col-id">ID</th>
+                    <th class="col-fecha">Fecha</th>
+                    <th class="col-actividad">Actividad</th>
+                    <th class="col-tiempo">Tiempo</th>
+                    <th class="col-observaciones">Observaciones</th>
+                    <th class="col-semana">Semana</th>
+                    <th class="col-acciones">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (!empty($tasks)): ?>
                     <?php foreach ($tasks as $task): ?>
                         <tr>
-                            <td><?php echo $task['id']; ?></td>
-                            <td><?php echo $task['fecha']; ?></td>
-                            <td><?php echo $task['actividad']; ?></td>
-                            <td><?php echo $task['tiempo']; ?></td>
-                            <td class="truncate" title="<?php echo $task['observaciones']; ?>">
+                            <td class="col-id"><?php echo $task['id']; ?></td>
+                            <td class="col-fecha"><?php echo date("d/m/Y", strtotime($task['fecha'])); ?></td>
+                            <td class="col-actividad"><?php echo $task['actividad']; ?></td>
+                            <td class="col-tiempo"><?php echo $task['tiempo']; ?></td>
+                            <td class="col-observaciones truncate" title="<?php echo $task['observaciones']; ?>">
                                 <?php echo $task['observaciones']; ?>
                             </td>
-                            <td><?php echo $task['semana']; ?></td>
-                            <td>
+                            <td class="col-semana"><?php echo $task['semana']; ?></td>
+                            <td class="col-acciones">
                                 <!-- Botón para editar -->
                                 <button onclick="window.location.href='php/edit_record.php?id=<?php echo htmlspecialchars($task['id']); ?>'" class="edit-btn">Editar</button>
 

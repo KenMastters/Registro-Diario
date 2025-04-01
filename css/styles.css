@@ -103,18 +103,22 @@ a:hover {
 
 /* Estilos para la tabla de historial */
 table {
-    width: 100%;
+    width: 90%;
     border-collapse: collapse;
     margin-top: 40px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+   
 }
 
 table th,
 table td {
-    padding: 12px;
+    padding: 8px;
     text-align: left;
     border: 1px solid #ddd;
     font-size: 1rem;
+    overflow: hidden; /* Ocultar contenido que exceda el ancho */
+    text-overflow: ellipsis; /* Mostrar "..." si el contenido es demasiado largo */
+    white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
 }
 
 table th {
@@ -362,4 +366,42 @@ input[type="date"] {
     border-radius: 5px;
     font-size: 1rem;
     font-weight: bold;
+}
+/* Ajustar el ancho de las columnas */
+.col-id {
+    width: 5px; /* Ancho para la columna ID */
+    text-align: center; /* Centrar el contenido */
+}
+
+.col-fecha {
+    width: 10px; /* Ancho para la columna Fecha */
+    text-align: left; /* Alinear a la izquierda */
+}
+
+.col-actividad {
+    width: 200px; /* Ancho para la columna Actividad */
+    text-align: left;
+}
+
+.col-tiempo {
+    width: 30px; /* Ancho para la columna Tiempo */
+    text-align: center;
+}
+
+.col-observaciones {
+    width: 250px; /* Ancho para la columna Observaciones */
+    text-align: left;
+    overflow: hidden; /* Ocultar contenido que exceda el ancho */
+    text-overflow: ellipsis; /* Mostrar "..." si el texto es demasiado largo */
+    white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
+}
+
+.col-semana {
+    width: 50px; /* Ancho para la columna Semana */
+    text-align: left;
+}
+
+.col-acciones {
+    width: 30px; /* Ancho para la columna Acciones */
+    text-align: center;
 }
